@@ -5,7 +5,7 @@ import spacy
 import gensim
 from gensim.models import Word2Vec
 import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer #importing Tfidf from sklearn
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import RFE
@@ -17,9 +17,7 @@ from sklearn.metrics import accuracy_score, classification_report
 #-----------------------------------Importing the Dataset
 
 dataset_url = "https://raw.githubusercontent.com/osamuzahid/NLP/refs/heads/main/bbc-text.csv" #loading the dataset, which was uploaded to github
-df = pd.read_csv(dataset_url) #reading the data from the .csv file in the url and loading it into a dataframe for further analysis and manipulation
-
-print (df.head(10)) #printing the first few rows to ensure the dataframe was loaded properly
+df = pd.read_csv(dataset_url) #Using pandas to read the data from the .csv file in the url and loading it into a dataframe for further analysis and manipulation
 
 #----------------------------------Preprocessing Data With Spacy
 
@@ -37,7 +35,7 @@ def token_split(text): #a function to take an input string and return a list of 
 df.columns
 df['processed_and_tokenized_text'] = df['processed_text'].apply(token_split) #applying the token_split function to the processed text to get individual tokens from the previously preprocessed strings
 
-#----------------------------------Using NER as the second of our first of three features
+#----------------------------------Using NER as the first of our three features
 
 def named_entity_counts(row): #creating a function to count the relevant named entities for each category
     text = row['processed_text']
@@ -68,13 +66,9 @@ def named_entity_counts(row): #creating a function to count the relevant named e
 
     return entity_counts
 
-
 df['entity_counts'] = df.apply(named_entity_counts, axis=1) # Applying the function to each row
 
-
 #----------------------------------Using TFIDF as the second of our three features
-
-
 
 tfidf = TfidfVectorizer(max_features = 1000) #Creating an instance of the Tfidf vectorizer and limiting it to a maximum of 1000 features
 
@@ -84,9 +78,7 @@ df_tfidf = pd.DataFrame(tfidf_vectors.toarray()) # Converting the sparse matrix 
 
 df = pd.concat([df, df_tfidf], axis=1) #Combining the original dataframe with the new tf_idf dataframe, adding tfidf features as new columns to the original dataframe
 
-print (df.head(10)) #Printing a few lines to ensure everything is working
-
-#----------------------------------Using Word Embeddings (implemented via Word2Vec) as the second of our three features
+#----------------------------------Using Word Embeddings (implemented via Word2Vec) as the third of our three features
 
 # Training the Word2Vec model
 tokenized_docs = df['processed_and_tokenized_text'].tolist()
@@ -123,17 +115,14 @@ df_all_features = pd.concat([df['category'], df_all_features], axis = 1) #adding
 
 df_all_features = df_all_features.fillna(0) #filling up the N/A spaces in our data frame with zeroes
 
-print (df_all_features.head(10)) #printing a few rows to ensure everything is working as expected
-
-
 #-------------------------------Scaling the features to ensure they contribute equally to model performance.
 
 X = df_all_features.drop('category', axis=1)  # Removing the target column to separate it from features
-X.columns = X.columns.astype(str)
-scaler = StandardScaler()  # Create a StandardScaler object
-X_scaled = scaler.fit_transform(X)  # Apply scaling to the features
+X.columns = X.columns.astype(str) #Converting all columns to strings to avoid type errors
+scaler = StandardScaler()  # Creating a StandardScaler object
+X_scaled = scaler.fit_transform(X)  # Applying scaling to the features
 
-X_scaled_df = pd.DataFrame(X_scaled, columns=X.columns)
+X_scaled_df = pd.DataFrame(X_scaled, columns=X.columns) #Creating a new dataframe with the scaled features
 
 #-------------------------------Performing feature selection using RFE to get the top features from our chosen features
 
@@ -143,11 +132,11 @@ y = df_all_features['category']  # Setting y as the target category column
 encoder = LabelEncoder()  # Creating a LabelEncoder object
 y_encoded = encoder.fit_transform(y)  # Encoding the target categories as numerical values
 
-X.columns = X.columns.astype(str) #converting all columns in X to strings to avoid type errors during feature selection
+X.columns = X.columns.astype(str) #Converting all columns in X to strings to avoid type errors
 
 X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42) #splitting the data into training and test sets with an 80/20 distribution
 
-model = RandomForestClassifier(n_estimators=100, random_state=42) #creating the RandomForestClassifier model object with 100 decision trees
+model = RandomForestClassifier(n_estimators=100, random_state=42) #creating the RandomForestClassifier object with 100 decision trees
 
 selector = RFE(estimator=model, n_features_to_select=100) #initializing RFE using the RandomForestClassifier model and choosing the top 100 features
 
@@ -155,10 +144,7 @@ selector.fit(X_train, y_train) #Fitting the training data to determine the top 1
 
 selected_features = X_train.columns[selector.get_support()] #Acquiring the selected features
 
-print(selected_features) #Printing the selected features to check that everything is working as expected
-
 #-------------------------------Splitting the data and training our model
-
 
 #Splitting the data into a 70% training set and 30% temp set, which we'll split 15%/15% into training and test sets
 X_train, X_temp, y_train, y_temp = train_test_split(X_scaled_df[selected_features], y_encoded, test_size=0.3, random_state=42)
@@ -179,7 +165,7 @@ print("Performance Report:\n", classification_report(y_dev, y_dev_pred))
 
 
 y_test_pred = model.predict(X_test)
-test_accuracy = accuracy_score(y_test, y_test_pred) #Evaluating on the development set
+test_accuracy = accuracy_score(y_test, y_test_pred) #Evaluating on the test set
 print(f"Test Set Accuracy: {test_accuracy:.3f}")
 print("Performance Report:\n", classification_report(y_test, y_test_pred))
 
