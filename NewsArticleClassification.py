@@ -152,20 +152,40 @@ X_train, X_temp, y_train, y_temp = train_test_split(X_scaled_df[selected_feature
 
 X_test, X_dev, y_test, y_dev = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42) #Splitting the temp set into development and test sets
 
-#Training the model
+#Training the first model
 model = SVC(kernel='linear', random_state=42)
 model.fit(X_train, y_train)
 
-#-------------------------------Evaluating the model and printing the results
+#-------------------------------Evaluating the model on development sets to find the optmial parameters
 
-y_dev_pred = model.predict(X_dev)
-dev_accuracy = accuracy_score(y_dev, y_dev_pred) #Evaluating on the development set
-print(f"Development Set Accuracy: {dev_accuracy:.3f}")
-print("Performance Report:\n", classification_report(y_dev, y_dev_pred))
+#Evaluating the first model on the development set
+y_dev_pred_linear = model.predict(X_dev)
+dev_accuracy_linear = accuracy_score(y_dev, y_dev_pred_linear) #Evaluating on the development set
+print(f"Development Set Accuracy with Linear kernel: {dev_accuracy_linear:.3f}")
+print("Performance Report:\n", classification_report(y_dev, y_dev_pred_linear))
+
+#Training and testing the model with the rbf kernel to attempt optimization
+model2 = SVC(kernel='rbf', random_state=42)
+model2.fit(X_train, y_train)
+
+y_dev_pred_rbf = model2.predict(X_dev)
+dev_accuracy_rbf = accuracy_score(y_dev, y_dev_pred_rbf) #Evaluating on the development set
+print(f"Development Set Accuracy with RBF kernel: {dev_accuracy_rbf:.3f}")
+print("Performance Report:\n", classification_report(y_dev, y_dev_pred_rbf))
+
+#Training and testing the model with the poly kernel to attempt optimization
+model3 = SVC(kernel='poly', random_state=42)
+model3.fit(X_train, y_train)
 
 
-y_test_pred = model.predict(X_test)
-test_accuracy = accuracy_score(y_test, y_test_pred) #Evaluating on the test set
+y_dev_pred_poly = model3.predict(X_dev)
+dev_accuracy = accuracy_score(y_dev, y_dev_pred_poly) #Evaluating on the development set
+print(f"Development Set Accuracy with poly kernel: {dev_accuracy:.3f}")
+print("Performance Report:\n", classification_report(y_dev, y_dev_pred_poly))
+
+#-------------------------------Evaluating the optimal model on the final test set
+y_test_pred = model2.predict(X_test)
+test_accuracy = accuracy_score(y_test, y_test_pred) #Evaluating on the development set
 print(f"Test Set Accuracy: {test_accuracy:.3f}")
 print("Performance Report:\n", classification_report(y_test, y_test_pred))
 
