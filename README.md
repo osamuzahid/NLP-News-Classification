@@ -3,7 +3,13 @@ Second task for the first coursework of the NLP in Machine Learning module
 
 News Article Classification
 
-This project trains a machine learning model to categorize news articles into topics like politics, business, sports, entertainment, and technology. It uses various 
+This project trains a machine learning model to categorize news articles into the following topics:
+
+- politics
+- business
+- sports
+- entertainment
+- technology
 
 **--------Prerequisites--------**
 
@@ -12,7 +18,7 @@ Before running the script, ensure your system has the following:
 
 - Python (Preferably 3.8 or later)
   
-- Internet Access (Reqiored to download the dataset and spaCy model)
+- Internet Access (Required to download the dataset and spaCy model)
   
 - PIP (To install necessary libraries/dependencies)
 
@@ -22,7 +28,7 @@ Install the necessary libararies by running the following command in the termina
 
 pip install pandas spacy gensim scikit-learn numpy
 
-Run the followuing command to download spaCy's English model:
+Run the following command to download spaCy's English model:
 
 python -m spacy download en_core_web_sm
 
