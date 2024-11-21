@@ -40,7 +40,7 @@ git clone https://github.com/osamuzahid/NLP-News-Classification.git
 
 cd NLP-News-Classification
 
-2. Run the Python file with the ofllowing command:
+2. Run the Python file with the following command:
 
 python NewsArticleClassification.py
 
