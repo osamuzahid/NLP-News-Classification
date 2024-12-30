@@ -1,6 +1,3 @@
-# NLP-News-Classification
-Second task for the first coursework of the NLP in Machine Learning module
-
 News Article Classification
 
 This project trains a machine learning model to categorize news articles into the following topics:
